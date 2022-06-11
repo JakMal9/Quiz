@@ -12,13 +12,14 @@ RUN apt-get update -y \
 RUN mkdir /quiz_app
 WORKDIR /quiz_app
 COPY ./quiz_app /quiz_app
-COPY Pipfile Pipfile.lock ./
 
 RUN pip install --upgrade pip \
-    && pip install pipenv==v2022.6.7 \
-    && pipenv install --dev --system --deploy --verbose
+    && pip install poetry==1.1.13
 
-COPY ./docker-entrypoint.sh /
+COPY docker-entrypoint.sh poetry.lock pyproject.toml /
+
 RUN chmod +x /docker-entrypoint.sh
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-interaction --no-ansi
 
 ENTRYPOINT ["/docker-entrypoint.sh"]

@@ -31,6 +31,9 @@ test: ## Run unittests
 black: ## Run black
 	docker-compose exec quiz_app black .
 
+sort-imports: ## Run isort
+	docker-compose exec quiz_app isort .
+
 black-check: ## Check black
 	docker-compose exec quiz_app black --check .
 
