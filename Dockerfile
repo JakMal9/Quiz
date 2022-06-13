@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED=1
 
 RUN apt-get update -y \
     && apt-get install -y \
-    gcc libc-dev musl-dev  libpq-dev wait-for-it \
+    gcc libc-dev musl-dev  libpq-dev \
     && apt-get autoremove
 
 
@@ -21,5 +21,3 @@ COPY docker-entrypoint.sh poetry.lock pyproject.toml /
 RUN chmod +x /docker-entrypoint.sh
 RUN poetry config virtualenvs.create false \
     && poetry install --no-interaction --no-ansi
-
-ENTRYPOINT ["/docker-entrypoint.sh"]

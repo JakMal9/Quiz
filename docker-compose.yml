@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 
 services:
     db:
@@ -8,6 +8,11 @@ services:
             - POSTGRES_DB=quiz_app
             - POSTGRES_USER=quiz_app
             - POSTGRES_PASSWORD=secret
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
     quiz_app:
         container_name: quiz_app_backend
         build:
@@ -22,5 +27,7 @@ services:
             - DB_USER=quiz_app
             - DB_PASS=secret
             - DB_PORT=5432
+        entrypoint: /docker-entrypoint.sh
         depends_on:
-            - db
+            db:
+                condition: service_healthy
