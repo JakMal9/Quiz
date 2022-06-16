@@ -3,6 +3,19 @@ name: QuizApp CI
 on:
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      test:
+        description: 'Run pytest'
+        type: boolean
+        required: true
+        default: true
+      lint:
+        description: 'Run black check'
+        type: boolean
+        required: true
+        default: true
+
 
 jobs:
   build:
@@ -36,14 +49,13 @@ jobs:
         pip install poetry
         poetry install --no-interaction
     - name: Run migrations
-      run: |
-        poetry run python manage.py migrate
+      run: poetry run python manage.py migrate
       working-directory: ./quiz_app     
     - name: Run Tests
-      run: |
-        poetry run pytest
+      run: poetry run pytest
+      if: ${{ inputs.test }}
       working-directory: ./quiz_app
     - name: Run linter
-      run: |
-        poetry run black --check .
+      run: poetry run black --check .
+      if: ${{ inputs.lint }}
       working-directory: ./quiz_app
