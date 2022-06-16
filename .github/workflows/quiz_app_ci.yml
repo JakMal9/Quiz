@@ -3,6 +3,17 @@ name: QuizApp CI
 on:
   pull_request:
     branches: [ "main" ]
+    inputs:
+      test:
+        description: 'Run pytest'
+        type: boolean
+        required: true
+        default: true
+      lint:
+        description: 'Run black check'
+        type: boolean
+        required: true
+        default: true
   workflow_call:
     inputs:
       test:
