@@ -18,7 +18,7 @@ on:
 
 jobs:
   build:
-    name: Build quiz app backend
+    name: Test and lint quiz app backend
     runs-on: ubuntu-latest
     services:
       db:
