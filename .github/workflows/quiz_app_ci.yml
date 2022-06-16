@@ -3,6 +3,7 @@ name: QuizApp CI
 on:
   pull_request:
     branches: [ "main" ]
+  workflow_call:
     inputs:
       test:
         description: 'Run pytest'
@@ -59,6 +60,8 @@ jobs:
         python -m pip install --upgrade pip
         pip install poetry
         poetry install --no-interaction
+        echo ${{ github.event.inputs.lint }}
+        echo ${{ inputs.lint }}
     - name: Run migrations
       run: poetry run python manage.py migrate
       working-directory: ./quiz_app     
