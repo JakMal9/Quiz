@@ -1,0 +1,31 @@
+name: Trigger QuizApp CI
+
+on: 
+  workflow_dispatch:
+    inputs:
+      test:
+        description: 'Run pytest'
+        type: boolean
+        required: true
+        default: true
+      lint:
+        description: 'Run black check'
+        type: boolean
+        required: true
+        default: true
+
+jobs:
+  backend:
+    uses: ./.github/workflows/backend.yml
+  ci:
+    name: Lint and test
+    needs: [ backend ]
+    steps:     
+      - name: Run Tests
+        run: poetry run pytest
+        if: ${{ github.event.inputs.test }}
+        working-directory: ./quiz_app
+      - name: Run linter
+        run: poetry run black --check .
+        if: ${{ github.event.inputs.lint }}
+        working-directory: ./quiz_app
