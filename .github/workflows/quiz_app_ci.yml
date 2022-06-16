@@ -11,7 +11,8 @@ jobs:
     name: Lint and test
     runs-on: ubuntu-latest
     needs: [ backend ]
-    steps: 
+    steps:
+      - uses: actions/checkout@v3
       - name: Run Tests
         run: poetry run pytest
         working-directory: ./quiz_app
