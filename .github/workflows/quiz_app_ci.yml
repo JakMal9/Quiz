@@ -9,6 +9,7 @@ jobs:
     uses: ./.github/workflows/backend.yml
   ci:
     name: Lint and test
+    runs-on: ubuntu-latest
     needs: [ backend ]
     steps: 
       - name: Run Tests
