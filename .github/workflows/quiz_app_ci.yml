@@ -73,7 +73,7 @@ jobs:
         poetry install --no-interaction
     - name: Echo input
       run: |
-        echo '${{ github.event.inputs.lint }}''
+        echo '${{ github.event.inputs.lint }}'
         echo '${{ inputs.lint }}'
     - name: Run migrations
       run: poetry run python manage.py migrate
