@@ -1,0 +1,8 @@
+{% if question_answers %}
+    <h4>{{ question_answers.question.content }}</h4>
+    <br>
+    <p>Correct response:</p>
+    {{ question_answers.answer.content }}
+{% else %}
+    <p>No answer available</p>
+{% endif %}

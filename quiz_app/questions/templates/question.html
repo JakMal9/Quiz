@@ -1,0 +1,12 @@
+{% if question %}
+    <h4>{{ question.content }}</h4>
+    <ul>
+        {% for answer in question.answers.all %}
+        <li>{{answer.content}}</li>
+        {% endfor %}
+        <br>
+        <a href="/questions/{{question.id}}/answer/">Check correct answer</a>
+    </ul>
+{% else %}
+    <p>No question available</p>
+{% endif %}
