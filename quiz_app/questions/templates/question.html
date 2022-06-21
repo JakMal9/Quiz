@@ -5,7 +5,7 @@
         <li>{{answer.content}}</li>
         {% endfor %}
         <br>
-        <a href="/questions/{{question.id}}/answer/">Check correct answer</a>
+        <a href="{% url 'correct_answer' question.id %}">Check correct answer</a>
     </ul>
 {% else %}
     <p>No question available</p>
