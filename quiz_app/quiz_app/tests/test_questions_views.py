@@ -23,8 +23,13 @@ def test_question_details_view(client, question_with_answers):
 
 @pytest.mark.django_db
 def test_answer_view(client, question_with_answers):
-    questionanswers_db = QuestionsAnswers.objects.filter(correct=True).first()
-    res = client.get(f"/questions/{questionanswers_db.question.pk}/answer/")
-    assert res.status_code == 200
-    assert questionanswers_db.question.content in res.content.decode("utf-8")
-    assert questionanswers_db.answer.content in res.content.decode("utf-8")
+    questionanswers_db = QuestionsAnswers.objects.all()
+    for qa in questionanswers_db:
+        payload = {"answer": qa.answer.pk}
+        res = client.post(
+            f"/questions/{qa.question.pk}/answer/",
+            payload,
+            content_type="application/json",
+        )
+        assert res.status_code == 200
+        assert res.json()["correct"] == qa.correct

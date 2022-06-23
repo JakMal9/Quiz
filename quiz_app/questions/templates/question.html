@@ -1,12 +1,14 @@
 {% if question %}
+<header>
     <h4>{{ question.content }}</h4>
-    <ul>
-        {% for answer in question.answers.all %}
-        <li>{{answer.content}}</li>
-        {% endfor %}
-        <br>
-        <a href="{% url 'correct_answer' question.id %}">Check correct answer</a>
-    </ul>
+</header>
+<ul>
+    {% for answer in question.answers.all %}
+    <button apk="{{ answer.id }}" qpk="{{ question.id }}">{{answer.content}}</button>
+    {% endfor %}
+</ul>
 {% else %}
-    <p>No question available</p>
+<p>No question available</p>
 {% endif %}
+{% load static %}
+<script src="{% static 'isCorrect.js' %}"></script>
