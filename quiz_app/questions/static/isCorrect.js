@@ -1,6 +1,6 @@
-const btns = document.querySelectorAll("button");
+const answer_btns = document.querySelectorAll("button.answer");
 
-btns.forEach((btn) => {
+answer_btns.forEach((btn) => {
   btn.addEventListener("click", checkAnswer);
 });
 
@@ -21,6 +21,7 @@ async function checkAnswer(event) {
     const statusCode = response.status;
     const body = await response.json();
     isCorrectMessage(body.correct);
+    disableAnswers();
   } catch (err) {
     window.alert("Something went wrong. Please try again.");
   }
@@ -30,14 +31,20 @@ function isCorrectMessage(correct) {
   let msg;
   if (correct) {
     msg = "Success! Your answer is correct!";
+    const tryAgainBtn = document.getElementById("btn-try-again");
+    tryAgainBtn.remove();
   } else {
     msg = "Try again";
   }
-  const newHeading = document.createElement("h3");
-  newHeading.innerText = msg;
-  const mainHeading = document.querySelector("h4");
-  const header = document.querySelector("header");
-  header.insertBefore(newHeading, mainHeading);
+  const modal = document.getElementById("modal");
+  modal.firstElementChild.innerText = msg;
+  modal.showModal();
+}
+
+function disableAnswers() {
+  answer_btns.forEach((btn) => {
+    btn.disabled = true;
+  });
 }
 
 function getCookie(name) {

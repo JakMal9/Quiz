@@ -4,9 +4,14 @@
 </header>
 <ul>
     {% for answer in question.answers.all %}
-    <button apk="{{ answer.id }}" qpk="{{ question.id }}">{{answer.content}}</button>
+    <button class="answer" apk="{{ answer.id }}" qpk="{{ question.id }}">{{answer.content}}</button>
     {% endfor %}
 </ul>
+<dialog id='modal'>
+    <p></p>
+    <button onclick="location.href='{% url "questions_list" %}'" type="button">New question</button>
+    <button onclick="location.href='{% url "question_details" question.id %}'" type="button" id="btn-try-again">Try again</button>
+</dialog>
 {% else %}
 <p>No question available</p>
 {% endif %}
