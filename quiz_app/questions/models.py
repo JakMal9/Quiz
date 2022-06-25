@@ -10,13 +10,13 @@ class Answer(models.Model):
 
 class Question(models.Model):
     content = models.TextField(unique=True)
-    answers = models.ManyToManyField(Answer, through="QuestionsAnswers")
+    answers = models.ManyToManyField(Answer, through="QuestionAnswer")
 
     def __str__(self):
         return self.content
 
 
-class QuestionsAnswers(models.Model):
+class QuestionAnswer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     answer = models.ForeignKey(Answer, on_delete=models.CASCADE)
     correct = models.BooleanField(default=False)

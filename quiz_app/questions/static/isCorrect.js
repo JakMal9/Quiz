@@ -1,8 +1,46 @@
-const answer_btns = document.querySelectorAll("button.answer");
+const answerBtns = document.querySelectorAll("button.answer");
+const jsForm = document.querySelector("div#js");
+const htmlForm = document.querySelector("form#django");
+const switchJsBtn = document.getElementById("switchJS");
+const switchHtmlBtn = document.getElementById("switchHTML");
+const toggleMsg = document.getElementById("jsToggleInfo");
+const jsFormMsg = "JS Form enabled";
+const htmlFormMsg = "Django HTMLForm enabled";
 
-answer_btns.forEach((btn) => {
+window.addEventListener("DOMContentLoaded", (event) => {
+  if (localStorage.getItem("jsForm") == "active") {
+    switchFormToJS(event);
+  }
+});
+
+answerBtns.forEach((btn) => {
   btn.addEventListener("click", checkAnswer);
 });
+
+switchJsBtn.addEventListener("click", switchFormToJS);
+switchHtmlBtn.addEventListener("click", switchFormToHTML);
+
+function switchFormToJS(event) {
+  if (localStorage.getItem("jsForm") === null) {
+    localStorage.setItem("jsForm", "active");
+  }
+  jsForm.style.display = "block";
+  htmlForm.style.display = "none";
+  switchJsBtn.disabled = true;
+  switchHtmlBtn.disabled = false;
+  toggleMsg.innerText = jsFormMsg;
+}
+
+async function switchFormToHTML(event) {
+  if (localStorage.getItem("jsForm") == "active") {
+    localStorage.removeItem("jsForm");
+  }
+  jsForm.style.display = "none";
+  htmlForm.style.display = "block";
+  switchJsBtn.disabled = false;
+  switchHtmlBtn.disabled = true;
+  toggleMsg.innerText = htmlFormMsg;
+}
 
 async function checkAnswer(event) {
   const answerId = event.target.getAttribute("apk");
@@ -42,7 +80,7 @@ function isCorrectMessage(correct) {
 }
 
 function disableAnswers() {
-  answer_btns.forEach((btn) => {
+  answerBtns.forEach((btn) => {
     btn.disabled = true;
   });
 }
@@ -53,7 +91,6 @@ function getCookie(name) {
     const cookies = document.cookie.split(";");
     for (let i = 0; i < cookies.length; i++) {
       const cookie = cookies[i].trim();
-      // Does this cookie string begin with the name we want?
       if (cookie.substring(0, name.length + 1) === name + "=") {
         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
         break;
