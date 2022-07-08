@@ -72,3 +72,21 @@ def test_answer_view_index_out_of_range(client, question_with_answers):
         f"/questions/{last_question_id}/answer/", {"answer": out_of_range_a_id}
     )
     assert res.status_code == 404
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("answer", ["should not be string", 6.6, ""])
+@pytest.mark.parametrize(
+    "content_type", ["multipart/form-data; boundary=BoUnDaRyStRiNg", "application/json"]
+)
+def test_answer_view_incorrect_payload(
+    client, question_with_answers, answer, content_type
+):
+    qa_db = QuestionAnswer.objects.first()
+    content_type = {"content_type": content_type} if "json" in content_type else {}
+    payload = {"answer": answer}
+    res = client.post(
+        f"/questions/{qa_db.question.pk}/answer/", payload, **content_type
+    )
+    assert res.status_code == 302
+    assert res.url == f"/questions/{qa_db.question.pk}/"

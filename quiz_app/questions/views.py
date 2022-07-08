@@ -1,10 +1,10 @@
 import json
-from turtle import pd
 
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_POST
 
+from .forms import AnswerForm
 from .models import Question, QuestionAnswer
 
 
@@ -23,10 +23,13 @@ def correct_answer(request, question_id):
     """We could have data submitted either by AJAX or html form."""
     try:
         if request.POST:
-            answer_id = request.POST["answer"]
+            form = AnswerForm(request.POST)
         else:
             data = json.loads(request.body)
-            answer_id = data["answer"]
+            form = AnswerForm(data)
+        if not form.is_valid():
+            return redirect("question_details", question_id)
+        answer_id = form.data["answer"]
         question_answers = QuestionAnswer.objects.get(
             question__pk=question_id, answer__pk=answer_id
         )
