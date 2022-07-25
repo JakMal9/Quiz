@@ -66,8 +66,10 @@ def test_answer_view(
 
 
 @pytest.mark.parametrize("method", ["get", "put", "patch", "delete"])
-def test_answer_view_method_not_allowed(client: Client, method: str) -> None:
-    res = getattr(client, method)(f"/questions/1/answer/")
+def test_answer_view_method_not_allowed(
+    authenticated_client: Client, method: str
+) -> None:
+    res = getattr(authenticated_client, method)("/questions/1/answer/")
     assert res.status_code == 405
 
 
