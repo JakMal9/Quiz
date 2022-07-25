@@ -14,7 +14,7 @@ class QuestionDetailView(LoginRequiredMixin, DetailView):
     http_method_names: list[str] = ["get"]
     model = Question
     pk_url_kwarg: str = "question_id"
-    template_name: str = "single_question.html"
+    template_name: str = "question.html"
     context_object_name: str = "question"
 
 
