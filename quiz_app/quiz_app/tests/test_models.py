@@ -3,7 +3,6 @@ from typing import Generator
 
 import pytest
 from django.contrib.auth.models import User
-
 from questions.models import Answer, Question, QuestionAnswer, UserAnswer
 
 
