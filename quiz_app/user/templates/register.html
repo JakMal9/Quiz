@@ -1,0 +1,23 @@
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% if form.errors %}
+    {% for error in form.errors %}
+        <p>{{ error }}</p>
+    {% endfor %}
+{% endif %}
+{% if request.user.is_authenticated %}
+    You are logged in. Go to <a href="{% url 'questions_list' %}">questions list</a> or <a href="{% url 'logout' %}">logout</a>
+{% else %}
+    <h3>Register</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_table }}
+        <button type="submit">Sign up</button>
+    </form>
+{% endif %}
