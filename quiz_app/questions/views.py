@@ -1,13 +1,39 @@
 import json
+from typing import Any
 
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, JsonResponse
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import DetailView, ListView
 
 from .forms import AnswerForm
-from .models import Question, QuestionAnswer
+from .models import Question, QuestionAnswer, UserAnswer
+
+
+class UserAnswersView(LoginRequiredMixin, ListView):
+    http_method_names: list[str] = ["get"]
+    model = UserAnswer
+    template_name: str = "user_answers.html"
+    context_object_name: str = "user_answers"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(author=self.request.user)
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["username"] = self.request.user.username
+        return context
+
+    def render_to_response(
+        self, context: dict[str, Any], **response_kwargs: Any
+    ) -> HttpResponse:
+        if not self.object_list.exists():
+            messages.success(self.request, "Try to answer some questions first")
+            return redirect("questions_list")
+        return super().render_to_response(context, **response_kwargs)
 
 
 class QuestionDetailView(LoginRequiredMixin, DetailView):
@@ -44,6 +70,7 @@ class VerifyAnswerView(LoginRequiredMixin, View):
         except (QuestionAnswer.DoesNotExist, KeyError, ValueError):
             raise Http404()
         res = {"correct": question_answers.correct}
+        UserAnswer.objects.create(question_answer=question_answers, author=request.user)
         if request.POST:
             return render(request, "answer.html", {"question_id": question_id, **res})
         return JsonResponse(res)

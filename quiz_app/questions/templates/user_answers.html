@@ -1,0 +1,17 @@
+<h3>{{ username }}</h3>
+<table>
+    <tr>
+        <th>Question</th>
+        <th>Answer</th>
+        <th>Was correct</th>
+        <th>Date</th>
+    </tr>
+    {% for user_answer in user_answers %}
+    <tr>
+        <td>{{ user_answer.question_answer.question.content }}</td>
+        <td>{{ user_answer.question_answer.answer.content }}</td>
+        <td>{{ user_answer.question_answer.correct }}</td>
+        <td>{{ user_answer.answered_at|date:'Y-m-d H:i'}}</td>
+    </tr>
+    {% endfor %}
+</table>
