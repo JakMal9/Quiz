@@ -1,5 +1,4 @@
 import pytest
-
 from questions.models import UserAnswer
 from questions.utils import get_users_stats
 
