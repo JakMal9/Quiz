@@ -1,7 +1,6 @@
 import pytest
 from django.contrib.auth.models import User
 from django.test import Client
-
 from questions.models import Question
 
 
