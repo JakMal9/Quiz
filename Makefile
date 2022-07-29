@@ -42,3 +42,6 @@ migration: ## Create migrations
 
 migrate: ## Migrate
 	docker-compose exec quiz_app  python manage.py migrate
+
+populate-database: ## Populate database with fake data
+	docker-compose exec quiz_app  python manage.py populate_database
