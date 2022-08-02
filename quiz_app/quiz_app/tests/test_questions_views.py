@@ -2,6 +2,7 @@ from typing import Union
 
 import pytest
 from django.test import Client
+
 from questions.models import Answer, Question, QuestionAnswer
 
 
