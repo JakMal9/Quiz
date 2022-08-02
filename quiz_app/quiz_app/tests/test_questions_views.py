@@ -59,7 +59,7 @@ def test_answer_view(
             assert res.json()["correct"] == qa.correct
         else:
             expected_msg = (
-                "Success! Your answer is correct!" if qa.correct else "Try again"
+                "Success! Correct answer" if qa.correct else "Incorrect answer"
             )
             assert expected_msg in res.content.decode("utf-8")
 
