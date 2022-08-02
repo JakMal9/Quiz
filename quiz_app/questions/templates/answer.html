@@ -1,11 +1,24 @@
-<div>
-{% if correct %}
-    <p>Success! Your answer is correct!</p>
-{% else %}
-    <p>Try again</p>
-{% endif %}
-    <button onclick="location.href='{% url "questions_list" %}'" type="button">New question</button>
-{% if question_id %}
-    <button onclick="location.href='{% url "question_details" question_id %}'" type="button" id="btn-try-again">Try again</button>
-{% endif %}
+{% extends "base.html" %}
+{% block content %}
+<div class="grid-container">
+    <div class="grid-x grid-padding-y">
+        <div class="cell large-12">
+            <div class="callout">
+                {% if correct %}
+                <h3>"Success! Correct answer"</h3>
+                <p>Your answer is correct! Let's try another question.</p>
+                {% else %}
+                <h3>Incorrect answer</h3>
+                <p>Your answer was incorrect - try again, or skip to the next question</p>
+                {% endif %}
+                <div>
+                    <button onclick="location.href='{% url "questions_list" %}'" type="button" class="button hollow">New question</button>
+                    {% if question_id %}
+                    <button onclick="location.href='{% url "question_details" question_id %}'" type="button" id="btn-try-again" class="button hollow">Try again</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+{% endblock %}

@@ -1,28 +1,48 @@
-{% if form.errors %}
-    {% for error in form.errors %}
-        <p>{{ error }}</p>
+{% extends "base.html" %}
+{% block content %}
+{% if form.username.errors %}
+    {% for error in form.username.errors %}
+    <div class="callout alert-callout-border alert" data-closable>
+        {{ error }}
+        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     {% endfor %}
 {% endif %}
-<p>{{ form.non_field_errors }}</p>
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+{% if form.password.errors %}
+    {% for error in form.password.errors %}
+    <div class="callout alert-callout-border alert" data-closable>
+        {{ error }}
+        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     {% endfor %}
-</ul>
 {% endif %}
 <form method="post" action="{% url 'login' %}">
     {% csrf_token %}
-    <table>
-    <tr>
-        <td>{{ form.username.label_tag }}</td>
-        <td>{{ form.username }}</td>
-    </tr>
-    <tr>
-        <td>{{ form.password.label_tag }}</td>
-        <td>{{ form.password }}</td>
-    </tr>
-    </table>
-    
-    <input type="submit" value="login">
+    <div class="grid-container">
+        <fieldset class="fieldset">
+            <legend>Login</legend>
+            <div class="grid-x grid-padding-x grid-padding-y">
+                <div class="medium-12 cell">
+                    {{ form.username.label_tag }}
+                    {{ form.username }}
+                </div>
+            </div>
+            <div class="grid-x grid-padding-x grid-padding-y">
+                <div class="medium-12 cell">
+                    {{ form.password.label_tag }}
+                    {{ form.password }}
+                </div>
+            </div>
+            <div class="grid-x grid-padding-x">
+                <div class="medium-12 cell">
+                    <input type="submit" value="Login" class="button">
+                </div>
+            </div>
+        </fieldset>
+    </div>
 </form>
+{% endblock %}
