@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 
@@ -23,3 +24,12 @@ class QuestionAnswer(models.Model):
 
     def __str__(self):
         return f"{self.question} - {self.answer}, correct: {self.correct}"
+
+
+class UserAnswer(models.Model):
+    answered_at = models.DateTimeField(auto_now_add=True)
+    question_answer = models.ForeignKey(QuestionAnswer, on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+    )
