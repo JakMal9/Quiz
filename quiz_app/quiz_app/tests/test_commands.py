@@ -6,16 +6,20 @@ from questions.models import Answer, Question, QuestionAnswer
 
 
 @pytest.mark.django_db
-def test_populate_database():
+@pytest.mark.parametrize("num_of_questions", [10, 20])
+def test_populate_database(num_of_questions: int) -> None:
     out = StringIO()
-    call_command("populate_database", stdout=out)
+    if num_of_questions == 10:
+        call_command("populate_database", stdout=out)
+    else:
+        call_command("populate_database", f"-questions={num_of_questions}", stdout=out)
     questions = Question.objects.all()
     answers = Answer.objects.all()
     questions_with_answers = QuestionAnswer.objects.all()
     output = out.getvalue()
-    assert len(questions) == 10
-    assert len(answers) == 40
-    assert len(questions_with_answers) == 40
-    assert questions_with_answers.filter(correct=True).count() == 10
+    assert len(questions) == num_of_questions
+    assert len(answers) == num_of_questions * 4
+    assert len(questions_with_answers) == num_of_questions * 4
+    assert questions_with_answers.filter(correct=True).count() == num_of_questions
     assert questions[0].answers.count() == 4
-    assert "Creating 10 questions with answers" in output
+    assert f"Creating {num_of_questions} questions with answers" in output
