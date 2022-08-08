@@ -9,6 +9,7 @@
     <title>QuizApp</title>
     <link rel="stylesheet" href="{% static 'css/foundation.css' %}">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/foundation-icons.css' %}">
   </head>
   <body>
     <div class="top-bar">
@@ -16,7 +17,8 @@
         <ul class="menu">
           <li class="menu-text">Quiz App</li>
           {% if request.user.is_authenticated %}
-            <li><a href="{% url 'questions_list' %}">Questions</a></li>
+            <li class="menu-element"><a href="{% url 'questions_list' %}">Questions</a></li>
+            <li class="menu-element"><a href="{% url 'user_answers' %}">Statistics</a></li>
           {% endif %}
         </ul>
       </div>
@@ -24,14 +26,14 @@
         <ul class="menu">
           {% if request.user.is_authenticated %}
             <li>
-              <a href="{% url 'logout' %}" class="button">Logout</a>
+              <a href="{% url 'logout' %}" class="button menu-button">Logout</a>
             </li>
           {% else %}
             <li>
-              <a href="{% url 'login' %}" class="button">Login</a>
+              <a href="{% url 'login' %}" class="button menu-button">Login</a>
             </li>
             <li>
-              <a href="{% url 'register' %}" class="button">Register</a>
+              <a href="{% url 'register' %}" class="button menu-button">Register</a>
             </li>
           {% endif %}
         </ul>

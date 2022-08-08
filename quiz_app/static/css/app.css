@@ -66,13 +66,149 @@
   border-radius: 5000px;
 }
 
+input:checked ~ .switch-paddle {
+  background: linear-gradient(69deg,#09b3bf,#5fe3c2);
+}
+
 .switch-paddle::after {
   border-radius: 5000px;
 }
 
 .answer-modal {
-  border: 1px solid rgba(10, 10, 10, 0.25);
+  border: 0.7px solid rgba(10, 10, 10, 0.25);
   padding: 2em;
   max-width: 50em;
   box-shadow: 0 0 1em rgb(0 0 0 / .3);
+}
+
+
+.button-hover-check {
+  border: 2px solid #767676;
+  border-radius: .5em;
+  background: transparent;
+  color: #767676;
+  text-transform: uppercase;
+  overflow: hidden;
+  letter-spacing: 0.07rem;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+}
+
+.button-hover-check span {
+  transition: all 0.2s ease-in-out;
+}
+
+.button-hover-check .fi {
+  position: absolute;
+  font-size: 1.2rem;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+          transform: translateY(-50%);
+  color: #33cac0;;
+  right: -20px;
+  transition: 0.4s right cubic-bezier(0.38, 0.6, 0.48, 1);
+}
+
+.button-hover-check:hover {
+  border-color: #33cac0;;
+  background: transparent;
+  transition: border-color 0.2s;
+}
+
+.button-hover-check:hover span {
+  margin-right: 20px;
+  color: #33cac0;;
+}
+
+.button-hover-check:hover .fi {
+  right: 12px;
+}
+
+progress[value] {
+  /* Reset the default appearance */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: none;
+  width: 100%;
+  height: 75%;
+  border-radius: .5em;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.25) inset;
+}
+
+progress[value]::-webkit-progress-bar {
+  background-color: #eee;
+  border-radius: .5em;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+}
+
+progress[value]::-webkit-progress-value {
+  background: linear-gradient(69deg,#09b3bf,#5fe3c2);
+  border-radius: .5em; 
+}
+
+progress[value]::-moz-progress-bar  {
+  background: linear-gradient(69deg,#09b3bf,#5fe3c2);
+  border-radius: .5em;
+}
+
+.button-empty {
+  border: 1px solid #09b3bf;
+  border-radius: .5em;
+  background: #ffffff;
+  color: #09b3bf;
+}
+
+.button-empty:hover {
+  color: #ffffff;
+  border-color: #ffffff;
+  background: linear-gradient(69deg,#09b3bf,#5fe3c2);
+}
+
+.button-empty:focus {
+  color: #ffffff;
+  border-color: #ffffff;
+  background: linear-gradient(69deg,#09b3bf,#5fe3c2);
+}
+
+.button-filter {
+  width: 100%;
+  font-weight: 300;
+}
+
+.centered {
+  text-align: center;
+}
+
+.menu-element {
+  border-radius: .3em;
+  transition: all 0.5s ease;
+}
+
+.menu-element a {
+  color: #09b3bf;
+}
+
+.menu-element a:hover {
+  color: #fefefe
+}
+
+.menu-element:hover {
+  box-shadow: 0 0 0 1px #fefefe;
+  background: linear-gradient(69deg,#09b3bf,#5fe3c2);
+}
+
+.menu-button {
+  color: #ffffff;
+  border-color: #ffffff;
+  background-color: #09b3bf;
+  border-radius: .5em;
+}
+
+.menu-button:hover {
+  border: 1px solid #09b3bf;
+  background: transparent;
+  color: #09b3bf;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
 }
