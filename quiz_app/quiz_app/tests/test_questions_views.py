@@ -1,7 +1,9 @@
 import datetime
 from typing import Generator, Union
+from unittest.mock import Mock, patch
 
 import pytest
+from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
 from django.test import Client
 from questions.models import Answer, Question, QuestionAnswer, UserAnswer
@@ -179,7 +181,7 @@ def test_user_answers_empty(
     )
 
 
-@pytest.mark.parametrize("method", ["post", "put", "patch", "delete"])
+@pytest.mark.parametrize("method", ["put", "patch", "delete"])
 def test_user_answers_view_method_not_allowed(
     authenticated_client: Client, method: str
 ) -> None:
@@ -188,8 +190,11 @@ def test_user_answers_view_method_not_allowed(
 
 
 @pytest.mark.django_db
-def test_user_answers_view_unauthorized(client: Client, user_answers: None) -> None:
-    res = client.get("/questions/user/answers/")
+@pytest.mark.parametrize("method", ["get", "post"])
+def test_user_answers_view_unauthorized(
+    client: Client, user_answers: None, method: str
+) -> None:
+    res = getattr(client, method)("/questions/user/answers/")
     assert res.status_code == 302
     assert "/auth/login/" in res.url
 
@@ -201,8 +206,44 @@ def test_user_answers_view_correct(
     res = authenticated_client.get("/questions/user/answers/")
     assert res.status_code == 200
     user_answers_db = UserAnswer.objects.all()
+    response = res.content.decode("utf-8")
     for answer in user_answers_db:
-        assert answer.author.username in res.content.decode("utf-8")
-        assert answer.question_answer.question.content in res.content.decode("utf-8")
-        assert answer.question_answer.answer.content in res.content.decode("utf-8")
-        assert str(answer.question_answer.correct) in res.content.decode("utf-8")
+        assert answer.author.username in response
+        assert answer.question_answer.question.content in response
+        assert answer.question_answer.answer.content in response
+        assert str(answer.question_answer.correct) in response
+    assert "25% correct answers" in response
+    assert "75% incorrect answers" in response
+
+
+@pytest.mark.django_db
+def test_user_answers_view_date_range(
+    authenticated_client: Client, user_answers: None, fake_now: datetime.datetime
+) -> None:
+    user = User.objects.first()
+    question_answer = QuestionAnswer.objects.first()
+    with patch("django.utils.timezone.now", Mock(return_value=fake_now)):
+        UserAnswer.objects.create(author=user, question_answer=question_answer)
+    res = authenticated_client.get("/questions/user/answers/")
+    assert res.status_code == 200
+    response = res.content.decode("utf-8")
+    assert "20% correct answers" in response
+    assert "80% incorrect answers" in response
+    payload = {"start_date": fake_now.date(), "end_date": fake_now.date()}
+    res_post = authenticated_client.post("/questions/user/answers/", payload)
+    assert res_post.status_code == 200
+    response_filtered = res_post.content.decode("utf-8")
+    assert "0% correct answers" in response_filtered
+    assert "100% incorrect answers" in response_filtered
+    assert "Total number of answered questions 1" in response_filtered
+
+
+@pytest.mark.django_db
+def test_user_answers_incorrect_payload(
+    authenticated_client: Client, user_answers: None
+) -> None:
+    payload = {"start_date": "test", "end_date": "test2"}
+    res_post = authenticated_client.post("/questions/user/answers/", payload)
+    assert res_post.status_code == 200
+    response_filtered = res_post.content.decode("utf-8")
+    assert "Enter a valid date." in response_filtered

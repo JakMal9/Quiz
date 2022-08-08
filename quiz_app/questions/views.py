@@ -8,29 +8,57 @@ from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import DetailView, ListView
 
-from .forms import AnswerForm
+from .forms import AnswerForm, QuizStatsForm
 from .models import Question, QuestionAnswer, UserAnswer
+from .utils import convert_range_to_datetime, get_users_stats
 
 
 class UserAnswersView(LoginRequiredMixin, ListView):
-    http_method_names: list[str] = ["get"]
+    http_method_names: list[str] = ["get", "post"]
     model = UserAnswer
     template_name: str = "user_answers.html"
     context_object_name: str = "user_answers"
+
+    def post(self, request, *args, **kwargs):
+        form = QuizStatsForm(request.POST)
+        user_answers = self.get_queryset()
+        self.object_list = user_answers
+        if form.is_valid() and user_answers.exists():
+            selected_range = convert_range_to_datetime(
+                form.cleaned_data.get("start_date"), form.cleaned_data.get("end_date")
+            )
+            self.object_list = user_answers.filter(answered_at__range=selected_range)
+        context = self.get_context_data(form=form)
+        return self.render_to_response(context)
 
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset.filter(author=self.request.user)
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        if not self.get_queryset().exists():
+            return {}
         context = super().get_context_data(**kwargs)
+        if kwargs.get("form"):
+            context["form"] = kwargs.get("form")
+        else:
+            answers_date_range = self.object_list.datetimes("answered_at", "day")
+            form = QuizStatsForm(
+                initial={
+                    "start_date": answers_date_range.first(),
+                    "end_date": answers_date_range.last(),
+                }
+            )
+            context["form"] = form
         context["username"] = self.request.user.username
+        context["user_stats"] = get_users_stats(self.object_list)
         return context
 
     def render_to_response(
         self, context: dict[str, Any], **response_kwargs: Any
     ) -> HttpResponse:
-        if not self.object_list.exists():
+        user_answers = self.get_queryset()
+        if not user_answers.exists():
             messages.success(self.request, "Try to answer some questions first")
             return redirect("questions_list")
         return super().render_to_response(context, **response_kwargs)

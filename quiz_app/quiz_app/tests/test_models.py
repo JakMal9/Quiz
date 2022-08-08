@@ -1,5 +1,6 @@
 import datetime
 from typing import Generator
+from unittest.mock import Mock, patch
 
 import pytest
 from django.contrib.auth.models import User
@@ -45,3 +46,31 @@ def test_create_user_answer(
     assert user_answer.author == user
     assert user_answer.question_answer == question_answer
     assert user_answer.answered_at == fake_now
+
+
+@pytest.mark.django_db
+def test_create_user_answer_different_dates(
+    question_with_answers: QuestionAnswer,
+    registered_user: User,
+) -> None:
+    question_answer = QuestionAnswer.objects.first()
+    user = User.objects.first()
+    UserAnswer.objects.create(author=user, question_answer=question_answer)
+    past_date = datetime.datetime.now() - datetime.timedelta(days=7)
+    with patch("django.utils.timezone.now", Mock(return_value=past_date)):
+        UserAnswer.objects.create(author=user, question_answer=question_answer)
+    date_range = UserAnswer.objects.datetimes("answered_at", "day")
+    assert date_range.count() == 2
+
+
+@pytest.mark.django_db
+def test_create_user_answer_queryset_methods(
+    question_with_answers: QuestionAnswer,
+    registered_user: User,
+) -> None:
+    question_answers = QuestionAnswer.objects.all()
+    user = User.objects.first()
+    for question_answer in question_answers:
+        UserAnswer.objects.create(author=user, question_answer=question_answer)
+    assert UserAnswer.objects.are_correct() == 1
+    assert UserAnswer.objects.are_incorrect() == 3

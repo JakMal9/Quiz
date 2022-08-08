@@ -56,7 +56,7 @@ def fake_now() -> datetime.datetime:
     return datetime.datetime(2022, 7, 10, 11, 0, 0, tzinfo=datetime.timezone.utc)
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture
 def patch_datetime_now(fake_now) -> Generator:
     with patch("django.utils.timezone.now", Mock(return_value=fake_now)):
         yield

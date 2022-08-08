@@ -26,6 +26,14 @@ class QuestionAnswer(models.Model):
         return f"{self.question} - {self.answer}, correct: {self.correct}"
 
 
+class UserAnswerQuerySet(models.QuerySet):
+    def are_correct(self):
+        return self.filter(question_answer__correct=True).count()
+
+    def are_incorrect(self):
+        return self.filter(question_answer__correct=False).count()
+
+
 class UserAnswer(models.Model):
     answered_at = models.DateTimeField(auto_now_add=True)
     question_answer = models.ForeignKey(QuestionAnswer, on_delete=models.CASCADE)
@@ -33,3 +41,4 @@ class UserAnswer(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
     )
+    objects = UserAnswerQuerySet.as_manager()
