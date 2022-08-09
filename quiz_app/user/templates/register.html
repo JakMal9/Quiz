@@ -1,23 +1,56 @@
 
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+{% extends "base.html" %}
+{% block content %}
+{% if form.username.errors %}
+    {% for error in form.username.errors %}
+    <div class="callout alert-callout-border alert" data-closable>
+        {{ error }}
+        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     {% endfor %}
-</ul>
 {% endif %}
-{% if form.errors %}
-    {% for error in form.errors %}
-        <p>{{ error }}</p>
+{% if form.password1.errors %}
+    {% for error in form.password1.errors %}
+    <div class="callout alert-callout-border alert" data-closable>
+        {{ error }}
+        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+{% endif %}
+{% if form.password2.errors %}
+    {% for error in form.password2.errors %}
+    <div class="callout alert-callout-border alert" data-closable>
+        {{ error }}
+        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     {% endfor %}
 {% endif %}
 {% if request.user.is_authenticated %}
-    You are logged in. Go to <a href="{% url 'questions_list' %}">questions list</a> or <a href="{% url 'logout' %}">logout</a>
+<div class="grid-container">
+    <div class="grid-x grid-padding-y">
+        <div class="large-12 cell">
+            <div class="callout">
+                <p class="text-center">You are logged in. Go to <a href="{% url 'questions_list' %}">questions list</a> or <a href="{% url 'logout' %}">logout</a></p>
+            </div>
+        </div>
+    </div>
+</div>
 {% else %}
-    <h3>Register</h3>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_table }}
-        <button type="submit">Sign up</button>
-    </form>
+<form method="post">
+    <div class="grid-container">
+        <fieldset class="fieldset">
+            <legend>Register</legend>
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="button menu-button">Sign up</button>     
+        </fieldset>
+    </div>
+</form>
 {% endif %}
+{% endblock %}
