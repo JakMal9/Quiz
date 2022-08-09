@@ -45,4 +45,4 @@ migrate: ## Migrate
 
 questions ?= 10
 populate-database: ## Populate database with fake data - specify num of questions with quesions=<int>
-	docker-compose exec quiz_app  python manage.py populate_database -questions=$(questions)
+	docker-compose exec quiz_app  python manage.py populate_database -q=$(questions)

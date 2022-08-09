@@ -1,4 +1,5 @@
 from io import StringIO
+from typing import Optional
 
 import pytest
 from django.core.management import call_command
@@ -6,13 +7,15 @@ from questions.models import Answer, Question, QuestionAnswer
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("num_of_questions", [10, 20])
-def test_populate_database(num_of_questions: int) -> None:
+@pytest.mark.parametrize(
+    "num_of_questions,command", [(10, None), (20, "-q"), (20, "--questions")]
+)
+def test_populate_database(num_of_questions: int, command: Optional[str]) -> None:
     out = StringIO()
     if num_of_questions == 10:
         call_command("populate_database", stdout=out)
     else:
-        call_command("populate_database", f"-questions={num_of_questions}", stdout=out)
+        call_command("populate_database", f"{command}={num_of_questions}", stdout=out)
     questions = Question.objects.all()
     answers = Answer.objects.all()
     questions_with_answers = QuestionAnswer.objects.all()

@@ -11,7 +11,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument(
-            "-questions",
+            "-q",
+            "--questions",
             type=int,
             default=10,
             help="Number of questions to be created.",
