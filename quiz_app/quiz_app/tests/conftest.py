@@ -5,6 +5,7 @@ from unittest.mock import Mock, patch
 import pytest
 from django.contrib.auth.models import User
 from django.test import Client
+from questions.factories import QuestionWithAnswersFactory
 from questions.models import Question, QuestionAnswer, UserAnswer
 
 
@@ -70,3 +71,8 @@ def user_answers(question_with_answers: None, registered_user: User) -> None:
         UserAnswer.objects.create(
             question_answer=question_answer, author=registered_user
         )
+
+@pytest.fixture
+@pytest.mark.django_db
+def multiple_questions() -> None:
+    QuestionWithAnswersFactory.create_batch(15)

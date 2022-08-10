@@ -5,6 +5,7 @@ from unittest.mock import Mock, patch
 import pytest
 from django.contrib.auth.models import User
 from questions.models import Answer, Question, QuestionAnswer, UserAnswer
+from quizzes.models import Quiz
 
 
 @pytest.mark.django_db
@@ -55,13 +56,15 @@ def test_create_user_answer_different_dates(
 ) -> None:
     question_answer = QuestionAnswer.objects.first()
     user = User.objects.first()
-    UserAnswer.objects.create(author=user, question_answer=question_answer)
+    quiz = Quiz.objects.create()
+    quiz.questions.add(question_answer.question)
+    UserAnswer.objects.create(author=user, question_answer=question_answer, quiz=quiz)
     past_date = datetime.datetime.now() - datetime.timedelta(days=7)
     with patch("django.utils.timezone.now", Mock(return_value=past_date)):
         UserAnswer.objects.create(author=user, question_answer=question_answer)
     date_range = UserAnswer.objects.datetimes("answered_at", "day")
     assert date_range.count() == 2
-
+    assert UserAnswer.objects.filter(quiz=quiz).count() == 1
 
 @pytest.mark.django_db
 def test_create_user_answer_queryset_methods(
@@ -74,3 +77,13 @@ def test_create_user_answer_queryset_methods(
         UserAnswer.objects.create(author=user, question_answer=question_answer)
     assert UserAnswer.objects.are_correct() == 1
     assert UserAnswer.objects.are_incorrect() == 3
+
+
+@pytest.mark.django_db
+def test_create_quiz(question_with_answers: QuestionAnswer) -> None:
+    question = Question.objects.first()
+    new_quiz = Quiz.objects.create()
+    new_quiz.questions.add(question)
+    quizzes = Quiz.objects.all()
+    assert quizzes.count() == 1
+    assert quizzes.first().questions.first() == question

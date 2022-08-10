@@ -1,0 +1,10 @@
+{% if form.errors %}
+    {% for field in form.fields %}
+        {{ field.errors }}
+    {% endfor %}
+{% endif %}
+<form action="{% url 'start_quiz' %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Start</button>
+</form>

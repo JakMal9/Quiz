@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.db import models
 
+from quizzes.models import Quiz
+
 
 class Answer(models.Model):
     content = models.CharField(max_length=256, unique=True)
@@ -37,6 +39,7 @@ class UserAnswerQuerySet(models.QuerySet):
 class UserAnswer(models.Model):
     answered_at = models.DateTimeField(auto_now_add=True)
     question_answer = models.ForeignKey(QuestionAnswer, on_delete=models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete=models.SET_NULL, blank=True, null=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
