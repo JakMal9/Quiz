@@ -1,28 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
 {% if question %}
-<header>
-    <h4>{{ question.content }}</h4>
-</header>
-<p id="jsToggleInfo">Django HTMLForm enabled</p>
-<button id="switchJS">JS</button>
-<button id="switchHTML" disabled>HTMLForm</button>
-<form method="post" action="{% url 'correct_answer' question.id %}" id="django">
-    {% csrf_token %}
-    {% for answer in question.answers.all %}
-    <button type="submit" name="answer" value="{{ answer.id }}">{{ answer.content }}</button>
-    {% endfor %}
-</form>
-<div id="js" style="display:none;">
-    {% for answer in question.answers.all %}
-    <button class="answer" apk="{{ answer.id }}" qpk="{{ question.id }}">{{answer.content}}</button>
-    {% endfor %}
+<div class="grid-container">
+    <fieldset class="fieldset">
+        <legend>Question</legend>
+        <div class="grid-x grid-padding-y">
+            <div class="cell large-auto">
+                <p>
+                    {{ question.content }}
+                </p>
+            </div>
+        </div>
+        <form method="post" action="{% url 'correct_answer' question.id %}" id="django">
+            {% csrf_token %}
+            {% for answer in question.answers.all %}
+            <div class="grid-x">
+                <div class="cell large-auto">
+                    <button type="submit" name="answer" value="{{ answer.id }}" class="button button-hover-check"><span>{{ answer.content }}</span><i class="fi fi-check"></i></button>
+                </div>
+            </div>
+            {% endfor %}
+        </form>
+        <div id="js" style="display:none;">
+            {% for answer in question.answers.all %}
+            <div class="grid-x">
+                <div class="cell large-auto">
+                    <button class="answer button button-hover-check" apk="{{ answer.id }}" qpk="{{ question.id }}"><span>{{answer.content}}</span><i class="fi fi-check"></i></button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </fieldset>
+    <div class="callout">
+        <p>Enable JS?</p>
+        <div class="grid-x">
+            <div class="cell medium-2">
+                <div class="switch large">
+                    <input type="checkbox" name="switchToJS" id="yes-no" class="switch-input">
+                    <label for="yes-no" class="switch-paddle">
+                        <span class="show-for-sr">Enable JS?</span>
+                        <span class="switch-active" aria-hidden="true">Yes</span>
+                        <span class="switch-inactive" aria-hidden="true">No</span>
+                    </label>
+                </div>
+            </div>
+            <div class="cell medium-10">
+                <p id="jsToggleInfo"><strong>Django HTMLForm enabled</strong></p>
+            </div>
+        </div>
+    </div>
 </div>
-<dialog id='modal'>
-    <p></p>
-    <button onclick="location.href='{% url "questions_list" %}'" type="button">New question</button>
-    <button onclick="location.href='{% url "question_details" question.id %}'" type="button" id="btn-try-again">Try again</button>
+<dialog id='modal' class="answer-modal">
+    <h3 id="dialog-title">Incorrect answer</h3>
+    <p id="dialog-description"></p>
+    <button onclick="location.href='{% url "question_details" question.id %}'" type="button" id="btn-try-again" class="button button-empty">Try again</button>
+    <button onclick="location.href='{% url "questions_list" %}'" type="button" class="button button-empty">New question</button>
 </dialog>
 {% else %}
 <p>No question available</p>
 {% endif %}
 {% load static %}
 <script src="{% static 'isCorrect.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,67 @@
+
+<!doctype html>
+<html class="no-js" lang="en" dir="ltr">
+  {% load static %}
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuizApp</title>
+    <link rel="stylesheet" href="{% static 'css/foundation.css' %}">
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+    <link rel="stylesheet" href="{% static 'css/foundation-icons.css' %}">
+  </head>
+  <body>
+    <div class="top-bar">
+      <div class="top-bar-left">
+        <ul class="menu">
+          <li class="menu-text">Quiz App</li>
+          {% if request.user.is_authenticated %}
+            <li class="menu-element"><a href="{% url 'questions_list' %}">Questions</a></li>
+            <li class="menu-element"><a href="{% url 'user_answers' %}">Statistics</a></li>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="top-bar-right">
+        <ul class="menu">
+          {% if request.user.is_authenticated %}
+            <li>
+              <a href="{% url 'logout' %}" class="button menu-button">Logout</a>
+            </li>
+          {% else %}
+            <li>
+              <a href="{% url 'login' %}" class="button menu-button">Login</a>
+            </li>
+            <li>
+              <a href="{% url 'register' %}" class="button menu-button">Register</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+    {% if messages %}
+      {% for message in messages %}
+      <div class="callout alert-callout-border {% if message.tags %}{{ message.tags }}{% endif %}" data-closable>
+          {{ message }}
+          <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      {% endfor %}
+    {% endif %}
+    {% if form.non_field_errors %}
+    <div class="callout alert-callout-border alert" data-closable>
+        {{ form.non_field_errors }}
+        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endif %}
+    {% block content %}
+    {% endblock %}
+    <script src="{% static 'js/vendor/jquery.js' %}" ></script>
+    <script src="{% static 'js/vendor/what-input.js' %}"></script>
+    <script src="{% static 'js/vendor/foundation.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+  </body>
+</html>

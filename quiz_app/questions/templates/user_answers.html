@@ -1,31 +1,100 @@
-<h3>{{ username }}</h3>
-<br>
-<h5>Total number of answered questions {{ user_stats.total_number }}</h5>
-<h5>{{ user_stats.correct_percent }}% correct answers ({{ user_stats.correct }})</h5>
-<h5>{{ user_stats.incorrect_percent }}% incorrect answers ({{ user_stats.incorrect }})</h5>
-<form action="" method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Filter</button>
-</form>
-{% if form.errors %}
-    {% for error in form.errors %}
-        <p>{{ error }}</p>
+{% extends "base.html" %}
+{% block content %}
+{% if form.start_date.errors %}
+    {% for error in form.start_date.errors %}
+    <div class="callout alert-callout-border alert" data-closable>
+        {{ error }}
+        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     {% endfor %}
 {% endif %}
-<table>
-    <tr>
-        <th>Question</th>
-        <th>Answer</th>
-        <th>Was correct</th>
-        <th>Date</th>
-    </tr>
-    {% for user_answer in user_answers %}
-    <tr>
-        <td>{{ user_answer.question_answer.question.content }}</td>
-        <td>{{ user_answer.question_answer.answer.content }}</td>
-        <td>{{ user_answer.question_answer.correct }}</td>
-        <td>{{ user_answer.answered_at|date:'Y-m-d H:i'}}</td>
-    </tr>
+{% if form.end_date.errors %}
+    {% for error in form.end_date.errors %}
+    <div class="callout alert-callout-border alert" data-closable>
+        {{ error }}
+        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
     {% endfor %}
-</table>
+{% endif %}
+<div class="grid-container">
+    <br>
+    <div class="grid-x grid-padding-y">
+        <div class="cell medium-4">
+            <h5>User: {{ username }}</h5>
+        </div>
+        <div class="cell medium-8">
+            <h5>Total number of answered questions: {{ user_stats.total_number }}</h5>
+        </div>
+    </div>
+    <div class="grid-x">
+        <div class="cell medium-4">
+            <h5>{{ user_stats.correct_percent }}% correct answers ({{ user_stats.correct }})</h5>
+        </div>
+        <div class="cell medium-8">
+            <progress class="stats-bar" max="100" value="{{ user_stats.correct_percent }}"></progress>
+        </div>
+    </div>
+    <div class="grid-x">
+        <div class="cell medium-4">
+            <h5>{{ user_stats.incorrect_percent }}% incorrect answers ({{ user_stats.incorrect }})</h5>
+        </div>
+        <div class="cell medium-8">
+            <progress class="stats-bar" max="100" value="{{ user_stats.incorrect_percent }}"></progress>
+        </div>
+    </div>
+    <hr>
+    <div class="grid-x grid-padding-y">
+        <div class="cell medium-4">
+            <form action="" method="post">
+                {% csrf_token %}
+                <div class="grid-x grid-padding-x">
+                    <div class="cell medium-6">
+                        <h5>Filter by date:</h5>
+                    </div>
+                </div>
+                <div class="grid-x grid-padding-x">
+                    <div class="cell small-12 medium-6">
+                        {{ form.start_date.label_tag }}
+                        {{ form.start_date }}
+                    </div>
+                    <div class="cell small-12 medium-6">
+                        {{ form.end_date.label_tag }}
+                        {{ form.end_date }}
+                    </div>
+                </div>
+                <div class="grid-x grid-padding-x">
+                    <div class="cell medium-12 centered">
+                        <button type="submit" class="button button-empty button-filter">Filter</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="cell medium-8">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Answer</th>
+                        <th>Was correct</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user_answer in user_answers %}
+                    <tr>
+                        <td>{{ user_answer.question_answer.question.content }}</td>
+                        <td>{{ user_answer.question_answer.answer.content }}</td>
+                        <td>{{ user_answer.question_answer.correct }}</td>
+                        <td>{{ user_answer.answered_at|date:'Y-m-d H:i'}}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

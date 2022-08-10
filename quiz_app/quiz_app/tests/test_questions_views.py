@@ -73,7 +73,7 @@ def test_answer_view(
             assert res.json()["correct"] == qa.correct
         else:
             expected_msg = (
-                "Success! Your answer is correct!" if qa.correct else "Try again"
+                "Success! Correct answer" if qa.correct else "Incorrect answer"
             )
             assert expected_msg in res.content.decode("utf-8")
 
@@ -235,7 +235,7 @@ def test_user_answers_view_date_range(
     response_filtered = res_post.content.decode("utf-8")
     assert "0% correct answers" in response_filtered
     assert "100% incorrect answers" in response_filtered
-    assert "Total number of answered questions 1" in response_filtered
+    assert "Total number of answered questions: 1" in response_filtered
 
 
 @pytest.mark.django_db
