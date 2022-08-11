@@ -8,15 +8,23 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('questions', '0002_useranswer'),
+        ("questions", "0002_useranswer"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='Quiz',
+            name="Quiz",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('questions', models.ManyToManyField(to='questions.question')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("questions", models.ManyToManyField(to="questions.question")),
             ],
         ),
     ]

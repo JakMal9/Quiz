@@ -1,10 +1,22 @@
-{% if form.errors %}
-    {% for field in form.fields %}
-        {{ field.errors }}
-    {% endfor %}
-{% endif %}
+{% extends "base.html" %}
+{% block content %}
 <form action="{% url 'start_quiz' %}" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Start</button>
+    <div class="grid-container">
+        <fieldset class="fieldset">
+            <legend>Start new quiz</legend>
+            <div class="grid-x grid-padding-x grid-padding-y">
+                <div class="cell medium-4 small-12">
+                    {{ form.num_of_questions.label_tag }}
+                    {{ form.num_of_questions }}
+                    <div class="grid-x grid-padding-x">
+                        <div class="cell medium-4 small-12">
+                            <button type="submit" class="button menu-button">Start Quiz</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+    </div>
 </form>
+{% endblock %}

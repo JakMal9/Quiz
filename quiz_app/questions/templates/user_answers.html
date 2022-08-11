@@ -1,25 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-{% if form.start_date.errors %}
-    {% for error in form.start_date.errors %}
-    <div class="callout alert-callout-border alert" data-closable>
-        {{ error }}
-        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    {% endfor %}
-{% endif %}
-{% if form.end_date.errors %}
-    {% for error in form.end_date.errors %}
-    <div class="callout alert-callout-border alert" data-closable>
-        {{ error }}
-        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    {% endfor %}
-{% endif %}
 <div class="grid-container">
     <br>
     <div class="grid-x grid-padding-y">

@@ -66,6 +66,7 @@ def test_create_user_answer_different_dates(
     assert date_range.count() == 2
     assert UserAnswer.objects.filter(quiz=quiz).count() == 1
 
+
 @pytest.mark.django_db
 def test_create_user_answer_queryset_methods(
     question_with_answers: QuestionAnswer,
