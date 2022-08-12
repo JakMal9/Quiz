@@ -1,25 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-{% if form.start_date.errors %}
-    {% for error in form.start_date.errors %}
-    <div class="callout alert-callout-border alert" data-closable>
-        {{ error }}
-        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    {% endfor %}
-{% endif %}
-{% if form.end_date.errors %}
-    {% for error in form.end_date.errors %}
-    <div class="callout alert-callout-border alert" data-closable>
-        {{ error }}
-        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
-    {% endfor %}
-{% endif %}
 <div class="grid-container">
     <br>
     <div class="grid-x grid-padding-y">
@@ -35,7 +15,9 @@
             <h5>{{ user_stats.correct_percent }}% correct answers ({{ user_stats.correct }})</h5>
         </div>
         <div class="cell medium-8">
-            <progress class="stats-bar" max="100" value="{{ user_stats.correct_percent }}"></progress>
+            <div class="quiz-stats-bar correct">
+                <span style="width:{{ user_stats.correct_percent }}%"></span>
+            </div>
         </div>
     </div>
     <div class="grid-x">
@@ -43,7 +25,9 @@
             <h5>{{ user_stats.incorrect_percent }}% incorrect answers ({{ user_stats.incorrect }})</h5>
         </div>
         <div class="cell medium-8">
-            <progress class="stats-bar" max="100" value="{{ user_stats.incorrect_percent }}"></progress>
+            <div class="quiz-stats-bar incorrect">
+                <span style="width:{{ user_stats.incorrect_percent }}%"></span>
+            </div>
         </div>
     </div>
     <hr>

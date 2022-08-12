@@ -6,17 +6,29 @@
             <div class="callout">
                 {% if correct %}
                 <h3>"Success! Correct answer"</h3>
-                <p>Your answer is correct! Let's try another question.</p>
+                <p>Your answer is correct!</p>
                 {% else %}
                 <h3>Incorrect answer</h3>
-                <p>Your answer was incorrect - try again, or skip to the next question</p>
+                <p>Your answer was incorrect.</p>
                 {% endif %}
+                {% if summary %}
+                <p>It was the last question of that quiz.</p>
                 <div>
+                    <button onclick="location.href='{% url "quiz_stats" quiz_id %}'" type="button" class="button button-empty">Check stats</button>
+                    <button onclick="location.href='{% url "start_quiz" %}'" type="button" class="button button-empty">New quiz</button>
+                </div>
+                {% else %}
+                <div>
+                    {% if next_question %}
+                    <button onclick="location.href='{% url "quiz_question" quiz_id=quiz_id question_id=next_question %}'" type="button" class="button button-empty">Next question</button>
+                    {% else %}
                     <button onclick="location.href='{% url "questions_list" %}'" type="button" class="button button-empty">New question</button>
                     {% if question_id %}
                     <button onclick="location.href='{% url "question_details" question_id %}'" type="button" id="btn-try-again" class="button button-empty">Try again</button>
                     {% endif %}
+                    {% endif %}
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>

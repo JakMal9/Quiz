@@ -7,7 +7,7 @@ const jsFormMsg = "<strong>JS Form enabled</strong>";
 const htmlFormMsg = "<strong>Django HTMLForm enabled</strong>";
 
 window.addEventListener("DOMContentLoaded", (event) => {
-  if (localStorage.getItem("jsForm") == "active") {
+  if (localStorage.getItem("jsForm") == "active" && switchBtn) {
     switchBtn.checked = true;
     switchFormToJS();
   }

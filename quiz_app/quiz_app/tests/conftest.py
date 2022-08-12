@@ -1,11 +1,14 @@
 import datetime
+import random
 from typing import Generator
 from unittest.mock import Mock, patch
 
 import pytest
 from django.contrib.auth.models import User
 from django.test import Client
+from questions.factories import QuestionWithAnswersFactory
 from questions.models import Question, QuestionAnswer, UserAnswer
+from quizzes.models import Quiz
 
 
 @pytest.fixture
@@ -70,3 +73,29 @@ def user_answers(question_with_answers: None, registered_user: User) -> None:
         UserAnswer.objects.create(
             question_answer=question_answer, author=registered_user
         )
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def multiple_questions() -> None:
+    QuestionWithAnswersFactory.create_batch(15)
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def small_quiz(multiple_questions) -> Quiz:
+    random_questions = random.sample(list(Question.objects.all()), 5)
+    new_quiz = Quiz.objects.create()
+    new_quiz.questions.set(random_questions)
+    return new_quiz
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def finished_quiz(small_quiz: Quiz, registered_user: User) -> Quiz:
+    for question in small_quiz.questions.all():
+        question_answer = QuestionAnswer.objects.filter(question=question).first()
+        UserAnswer.objects.create(
+            author=registered_user, quiz=small_quiz, question_answer=question_answer
+        )
+    return small_quiz

@@ -1,7 +1,11 @@
 import datetime
+import json
 from dataclasses import dataclass
 
 from django.db.models import QuerySet
+from django.http import Http404, HttpRequest
+from questions.forms import AnswerForm
+from questions.models import QuestionAnswer
 
 
 @dataclass
@@ -39,3 +43,21 @@ def get_users_stats(answers: QuerySet) -> UserStats:
     )
     stats.calculate_percentage()
     return stats
+
+
+def get_question_answer(request: HttpRequest, question_id: int) -> QuestionAnswer:
+    try:
+        if request.POST:
+            form = AnswerForm(request.POST)
+        else:
+            data = json.loads(request.body)
+            form = AnswerForm(data)
+        if not form.is_valid():
+            raise Http404()
+        answer_id = form.data["answer"]
+        question_answer = QuestionAnswer.objects.get(
+            question__pk=question_id, answer__pk=answer_id
+        )
+        return question_answer
+    except (QuestionAnswer.DoesNotExist, KeyError, ValueError):
+        raise Http404()
