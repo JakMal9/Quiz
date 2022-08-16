@@ -1,7 +1,9 @@
 import pytest
 from django.contrib.auth.models import User
+from django.contrib.messages import get_messages
 from django.test import Client
 from questions.models import Question, QuestionAnswer, UserAnswer
+from questions.utils import get_users_stats
 from quizzes.models import Quiz
 
 
@@ -67,6 +69,7 @@ def test_quiz_question_view_quiz_not_exists(
     "route",
     [
         "/quizzes/",
+        "/quizzes/{quiz_pk}/stats/",
         "/quizzes/{quiz_pk}/question/{question_pk}/",
         "/quizzes/{quiz_pk}/question/{question_pk}/answer/",
     ],
@@ -197,17 +200,92 @@ def test_quiz_answer_view_last_question(
         {"answer": question_answer.answer.pk},
         **content_type_header,
     )
+    message = get_messages(res.wsgi_request)._queued_messages[0].message
+    assert res.status_code == 302
+    assert res.url == f"/quizzes/{small_quiz.pk}/stats/"
+    assert "It was the last question. Check your stats and start a new quiz." in message
+
+
+@pytest.mark.django_db
+def test_quiz_stats_view(
+    authenticated_client: Client, finished_quiz: Quiz, user_answers: None
+) -> None:
+    res = authenticated_client.get(f"/quizzes/{finished_quiz.pk}/stats/")
     assert res.status_code == 200
-    if content_type_header:
-        content = res.json()
-        assert content["quiz_id"] == small_quiz.pk
-        assert not content.get("next_question")
-        assert content["summary"]
-    else:
-        expected_msg = (
-            "Success! Correct answer" if question_answer.correct else "Incorrect answer"
+    quiz_answers = UserAnswer.objects.filter(quiz=finished_quiz)
+    stats = get_users_stats(quiz_answers)
+    if stats.correct_percent < 80:
+        assert (
+            f"You have had {stats.correct_percent}% answers correctly"
+            in res.content.decode("utf-8")
         )
-        assert expected_msg in res.content.decode("utf-8")
+    else:
+        assert "Awesome! You nailed it!" in res.content.decode("utf-8")
+
+
+@pytest.mark.parametrize("method", ["post", "put", "patch", "delete"])
+def test_quiz_stats_view_method_not_allowed(
+    authenticated_client: Client, method: str
+) -> None:
+    res = getattr(authenticated_client, method)("/quizzes/1/stats/")
+    assert res.status_code == 405
+
+
+@pytest.mark.django_db
+def test_quiz_stats_out_of_range_view(
+    authenticated_client: Client, finished_quiz: Quiz, user_answers: None
+) -> None:
+    res = authenticated_client.get(f"/quizzes/{finished_quiz.pk + 100}/stats/")
+    message = get_messages(res.wsgi_request)._queued_messages[0].message
+    assert res.status_code == 302
+    assert "Quiz doesn't exist" in message
+    assert "/quizzes/" == res.url
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["post", "get"])
+def test_quiz_question_answered_twice_in_progress(
+    authenticated_client: Client, small_quiz: Quiz, method: str
+):
+    quiz_questions = [question.pk for question in small_quiz.questions.all()]
+    first_question = quiz_questions[0]
+    user = User.objects.get(pk=authenticated_client.session["_auth_user_id"])
+    question_answer = QuestionAnswer.objects.filter(question__pk=first_question).first()
+    UserAnswer.objects.create(
+        author=user, quiz=small_quiz, question_answer=question_answer
+    )
+    if method == "get":
+        res = authenticated_client.get(
+            f"/quizzes/{small_quiz.pk}/question/{first_question}/"
+        )
+        assert res.status_code == 302
+        assert res.url == f"/quizzes/{small_quiz.pk}/question/{quiz_questions[1]}/"
+    else:
+        res = authenticated_client.post(
+            f"/quizzes/{small_quiz.pk}/question/{first_question}/answer/",
+            {"answer": question_answer.answer.pk},
+        )
+        assert res.status_code == 200
         assert res.context["quiz_id"] == small_quiz.pk
-        assert not res.context.get("next_question")
-        assert res.context["summary"]
+        assert res.context["next_question"] == quiz_questions[1]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("method", ["post", "get"])
+def test_quiz_question_answered_twice_finished(
+    authenticated_client: Client, finished_quiz: Quiz, method: str
+):
+    quiz_questions = [question.pk for question in finished_quiz.questions.all()]
+    first_question = quiz_questions[0]
+    question_answer = QuestionAnswer.objects.filter(question__pk=first_question).first()
+    if method == "get":
+        res = authenticated_client.get(
+            f"/quizzes/{finished_quiz.pk}/question/{first_question}/"
+        )
+    else:
+        res = authenticated_client.post(
+            f"/quizzes/{finished_quiz.pk}/question/{first_question}/answer/",
+            {"answer": question_answer.answer.pk},
+        )
+    assert res.status_code == 302
+    assert res.url == f"/quizzes/{finished_quiz.pk}/stats/"

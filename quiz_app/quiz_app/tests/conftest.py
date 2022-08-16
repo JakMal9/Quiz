@@ -88,3 +88,14 @@ def small_quiz(multiple_questions) -> Quiz:
     new_quiz = Quiz.objects.create()
     new_quiz.questions.set(random_questions)
     return new_quiz
+
+
+@pytest.fixture
+@pytest.mark.django_db
+def finished_quiz(small_quiz: Quiz, registered_user: User) -> Quiz:
+    for question in small_quiz.questions.all():
+        question_answer = QuestionAnswer.objects.filter(question=question).first()
+        UserAnswer.objects.create(
+            author=registered_user, quiz=small_quiz, question_answer=question_answer
+        )
+    return small_quiz

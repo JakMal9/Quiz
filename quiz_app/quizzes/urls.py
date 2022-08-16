@@ -14,4 +14,9 @@ urlpatterns = [
         views.QuizQuestionDetailView.as_view(),
         name="quiz_question",
     ),
+    path(
+        "<int:quiz_id>/stats/",
+        views.QuizStatsView.as_view(),
+        name="quiz_stats",
+    ),
 ]

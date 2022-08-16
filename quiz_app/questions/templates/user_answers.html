@@ -15,7 +15,9 @@
             <h5>{{ user_stats.correct_percent }}% correct answers ({{ user_stats.correct }})</h5>
         </div>
         <div class="cell medium-8">
-            <progress class="stats-bar" max="100" value="{{ user_stats.correct_percent }}"></progress>
+            <div class="quiz-stats-bar correct">
+                <span style="width:{{ user_stats.correct_percent }}%"></span>
+            </div>
         </div>
     </div>
     <div class="grid-x">
@@ -23,7 +25,9 @@
             <h5>{{ user_stats.incorrect_percent }}% incorrect answers ({{ user_stats.incorrect }})</h5>
         </div>
         <div class="cell medium-8">
-            <progress class="stats-bar" max="100" value="{{ user_stats.incorrect_percent }}"></progress>
+            <div class="quiz-stats-bar incorrect">
+                <span style="width:{{ user_stats.incorrect_percent }}%"></span>
+            </div>
         </div>
     </div>
     <hr>

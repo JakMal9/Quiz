@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="grid-container">
+    <fieldset class="fieldset {% if user_stats.correct_percent < 80 %}red-border{% endif %}">
+        <legend>Quiz stats</legend>
+        <div class="grid-x grid-padding-y">
+            <div class="cell">
+                {% if user_stats.correct_percent < 80 %}
+                <h5 class="text-incorrect">You have had {{ user_stats.correct_percent }}% answers correctly. You need to work on it - take another quiz and improve!</h5>
+                {% else %}
+                <h5 class="text-correct">Awesome! You nailed it!</h5>
+                {% endif %}
+            </div>
+        </div>
+        <div class="grid-x grid-padding-y">
+            <div class="cell medium-4 small-12">
+                <h5>Total number of answers: {{ user_stats.total_number }}</h5>
+            </div>
+            <div class="cell medium-4 small-12">
+                <div class="grid-x grid-padding-y grid-padding-x">
+                    <div class="cell">
+                        <h5 class="text-correct">Correct answers: {{ user_stats.correct_percent }}% ({{ user_stats.correct }})</h5>
+                    </div>
+                </div>
+                <div class="grid-x grid-padding-y grid-padding-x">
+                    <div class="cell">
+                        <div class="quiz-stats-bar correct">
+                            <span style="width:{{ user_stats.correct_percent }}%"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="cell medium-4 small-12">
+                <div class="grid-x grid-padding-y grid-padding-x">
+                    <div class="cell">
+                        <h5 class="text-incorrect">Incorrect answers: {{ user_stats.incorrect_percent }}% ({{ user_stats.incorrect }})</h5>
+                    </div>
+                </div>
+                <div class="grid-x grid-padding-y grid-padding-x">
+                    <div class="cell">
+                        <div class="quiz-stats-bar incorrect">
+                            <span style="width:{{ user_stats.incorrect_percent }}%"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="grid-x grid-padding-y">
+            <div class="cell">
+                <button onclick="location.href='{% url "start_quiz" %}'" type="button" class="button full-width button-empty">New quiz</button>
+            </div>
+        </div>
+    </fieldset>
+</div>
+{% endblock %}

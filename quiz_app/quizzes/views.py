@@ -4,12 +4,12 @@ from typing import Any
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import Form
-from django.http import JsonResponse
-from django.shortcuts import render
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views import View
-from django.views.generic import DetailView, FormView
+from django.views.generic import DetailView, FormView, ListView
 from questions.models import Question, UserAnswer
-from questions.utils import get_question_answer
+from questions.utils import get_question_answer, get_users_stats
 from quizzes.utils import get_quiz_and_question, get_remaining_quiz_questions
 
 from .forms import StartQuizForm
@@ -53,6 +53,27 @@ class QuizQuestionDetailView(LoginRequiredMixin, DetailView):
         context["quiz_id"] = current_quiz.pk
         return context
 
+    def render_to_response(
+        self, context: dict[str, Any], **response_kwargs: Any
+    ) -> HttpResponse:
+        if UserAnswer.objects.filter(
+            quiz__pk=context["quiz_id"],
+            question_answer__question__pk=self.kwargs["question_id"],
+            author=self.request.user,
+        ).exists():
+            quiz = get_object_or_404(Quiz, pk=context["quiz_id"])
+            questions_left = get_remaining_quiz_questions(
+                self.request.user, quiz, self.kwargs["question_id"]
+            )
+            if len(questions_left) == 0:
+                return redirect("quiz_stats", quiz_id=context["quiz_id"])
+            return redirect(
+                "quiz_question",
+                quiz_id=context["quiz_id"],
+                question_id=questions_left[0],
+            )
+        return super().render_to_response(context, **response_kwargs)
+
 
 class VerifyQuizAnswerView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
@@ -64,21 +85,23 @@ class VerifyQuizAnswerView(LoginRequiredMixin, View):
             self.request.user, current_quiz, current_question.pk
         )
         question_answer = get_question_answer(request, current_question.pk)
+        if not UserAnswer.objects.filter(
+            question_answer=question_answer, quiz=current_quiz, author=request.user
+        ).exists():
+            UserAnswer.objects.create(
+                question_answer=question_answer, quiz=current_quiz, author=request.user
+            )
+        if len(questions_left) == 0:
+            messages.success(
+                request,
+                "It was the last question. Check your stats and start a new quiz.",
+            )
+            return redirect("quiz_stats", quiz_id=current_quiz.pk)
         res = {
             "correct": question_answer.correct,
             "quiz_id": current_quiz.pk,
+            "next_question": questions_left[0],
         }
-        UserAnswer.objects.create(
-            question_answer=question_answer, quiz=current_quiz, author=request.user
-        )
-        if len(questions_left) == 0:
-            res["summary"] = True
-            messages.success(
-                request,
-                "It was the last question. Check your stats, or start a new quiz.",
-            )
-        else:
-            res["next_question"] = questions_left[0]
         if request.POST:
             return render(
                 request,
@@ -86,3 +109,28 @@ class VerifyQuizAnswerView(LoginRequiredMixin, View):
                 {"question_id": current_question.pk, **res},
             )
         return JsonResponse(res)
+
+
+class QuizStatsView(LoginRequiredMixin, ListView):
+    http_method_names: list[str] = ["get"]
+    model = UserAnswer
+    template_name: str = "quiz_stats.html"
+    context_object_name: str = "user_answers"
+
+    def get_queryset(self):
+        return self.model.objects.filter(
+            author=self.request.user, quiz__pk=self.kwargs["quiz_id"]
+        )
+
+    def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
+        context = super().get_context_data(**kwargs)
+        context["user_stats"] = get_users_stats(self.object_list)
+        return context
+
+    def render_to_response(
+        self, context: dict[str, Any], **response_kwargs: Any
+    ) -> HttpResponse:
+        if not self.object_list:
+            messages.warning(self.request, "Quiz doesn't exist")
+            return redirect("start_quiz")
+        return super().render_to_response(context, **response_kwargs)
