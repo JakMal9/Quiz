@@ -11,7 +11,11 @@
                 </p>
             </div>
         </div>
-        <form method="post" action="{% url 'correct_answer' question.id %}" id="django">
+        {% if quiz_id %}
+            <form method="post" action="{% url 'quiz_answer' quiz_id=quiz_id question_id=question.id %}" id="quizAnswer">
+        {% else %}
+            <form method="post" action="{% url 'correct_answer' question.id %}" id="sandboxAnswer">
+        {% endif %}
             {% csrf_token %}
             {% for answer in question.answers.all %}
             <div class="grid-x">
@@ -31,6 +35,7 @@
             {% endfor %}
         </div>
     </fieldset>
+    {% if not quiz_id %}
     <div class="callout">
         <p>Enable JS?</p>
         <div class="grid-x">
@@ -49,6 +54,7 @@
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 <dialog id='modal' class="answer-modal">
     <h3 id="dialog-title">Incorrect answer</h3>

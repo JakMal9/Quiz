@@ -17,8 +17,9 @@
         <ul class="menu">
           <li class="menu-text">Quiz App</li>
           {% if request.user.is_authenticated %}
-            <li class="menu-element"><a href="{% url 'questions_list' %}">Questions</a></li>
-            <li class="menu-element"><a href="{% url 'user_answers' %}">Statistics</a></li>
+          <li class="menu-element"><a href="{% url 'start_quiz' %}">Start Quiz</a></li>
+          <li class="menu-element"><a href="{% url 'user_answers' %}">Statistics</a></li>
+          <li class="menu-element"><a href="{% url 'questions_list' %}">Questions</a></li>
           {% endif %}
         </ul>
       </div>
@@ -50,12 +51,26 @@
       {% endfor %}
     {% endif %}
     {% if form.non_field_errors %}
-    <div class="callout alert-callout-border alert" data-closable>
-        {{ form.non_field_errors }}
-        <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
-            <span aria-hidden="true">&times;</span>
-        </button>
-    </div>
+      {% for error in form.non_field_errors %}
+      <div class="callout alert-callout-border alert" data-closable>
+          {{ error }}
+          <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+              <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+      {% endfor %}
+    {% endif %}
+    {% if form.errors %}
+      {% for field in form %}
+          {% for error in field.errors %}
+          <div class="callout alert-callout-border alert" data-closable>
+            {{ error }}
+            <button class="close-button" aria-label="Dismiss alert" type="button" data-close>
+                <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          {% endfor %}
+      {% endfor %}
     {% endif %}
     {% block content %}
     {% endblock %}

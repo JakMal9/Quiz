@@ -1,16 +1,15 @@
-import json
 from typing import Any
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.views import View
 from django.views.generic import DetailView, ListView
 
-from .forms import AnswerForm, QuizStatsForm
-from .models import Question, QuestionAnswer, UserAnswer
-from .utils import convert_range_to_datetime, get_users_stats
+from .forms import QuizStatsForm
+from .models import Question, UserAnswer
+from .utils import convert_range_to_datetime, get_question_answer, get_users_stats
 
 
 class UserAnswersView(LoginRequiredMixin, ListView):
@@ -83,22 +82,9 @@ class VerifyAnswerView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         """We could have data submitted either by AJAX or html form."""
         question_id = kwargs["question_id"]
-        try:
-            if request.POST:
-                form = AnswerForm(request.POST)
-            else:
-                data = json.loads(request.body)
-                form = AnswerForm(data)
-            if not form.is_valid():
-                return redirect("question_details", question_id)
-            answer_id = form.data["answer"]
-            question_answers = QuestionAnswer.objects.get(
-                question__pk=question_id, answer__pk=answer_id
-            )
-        except (QuestionAnswer.DoesNotExist, KeyError, ValueError):
-            raise Http404()
-        res = {"correct": question_answers.correct}
-        UserAnswer.objects.create(question_answer=question_answers, author=request.user)
+        question_answer = get_question_answer(request, question_id)
+        res = {"correct": question_answer.correct}
+        UserAnswer.objects.create(question_answer=question_answer, author=request.user)
         if request.POST:
             return render(request, "answer.html", {"question_id": question_id, **res})
         return JsonResponse(res)

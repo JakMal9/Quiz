@@ -129,8 +129,7 @@ def test_answer_view_incorrect_payload(
     res = authenticated_client.post(
         f"/questions/{qa_db.question.pk}/answer/", payload, **content_type_header
     )
-    assert res.status_code == 302
-    assert res.url == f"/questions/{qa_db.question.pk}/"
+    assert res.status_code == 404
 
 
 @pytest.mark.django_db
